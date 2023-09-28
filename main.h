@@ -10,9 +10,8 @@ typedef struct team {
     int points;
 } team;
 
-typedef struct group {
-    string teamOne;
-    string teamTwo;
-    string teamThree;
-    string teamFour;
-} group;
+struct greater_than_points {
+    inline bool operator() (const team& team1, const team& team2) {
+        return (team1.points > team2.points);
+    }
+};

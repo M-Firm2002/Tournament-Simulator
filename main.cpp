@@ -1,5 +1,6 @@
 #include "main.h"
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -25,6 +26,7 @@ void addTeam(team *A) {
 void Fixture(team& teamA, team& teamB) {
     int teamAgoals = 0, teamBgoals = 0;
     cout << "\nNext Fixture: \n" << teamA.name << " vs " << teamB.name << endl;
+    cin.ignore();
 
     if (teamA.attack - teamB.defence > 0) {
         teamAgoals = teamA.attack - teamB.defence;
@@ -49,20 +51,21 @@ void Fixture(team& teamA, team& teamB) {
 }
 
 int main(int argc, char * const argv[]) {
-    int NumOfTeams;
+    int numOfTeams;
+    vector<team> pool1, pool2;
 
     cout << "Welcome to Tournament Simulator" << endl;
     cout << "\nSelect the number of teams";
     cout << "\n 8 (2 groups)";
     cout << "\n 16 (4 groups)";
     cout << "\n 32 (8 groups)" << endl;
-    cin >> NumOfTeams;
+    cin >> numOfTeams;
 
-    if (NumOfTeams == 8 || NumOfTeams == 16 || NumOfTeams == 32) {
-        const int GroupSize = 4, NumOfGroups = NumOfTeams / GroupSize;
+    if (numOfTeams == 8 || numOfTeams == 16 || numOfTeams == 32) {
+        const int GroupSize = 4, numOfGroups = numOfTeams / GroupSize;
         vector<vector<team>> groups;
 
-        for (int i = 0; i < NumOfGroups; i++) {
+        for (int i = 0; i < numOfGroups; i++) {
             vector<team> group;
 
             for (int j = 0; j < GroupSize; j++) {
@@ -81,6 +84,16 @@ int main(int argc, char * const argv[]) {
                     cin.ignore();
                 }
             }
+
+            team teamA;
+            team teamB;
+
+            sort(group->begin(), group->end(), greater_than_points());
+            teamA = group->at(0);
+            teamB = group->at(1);
+
+            pool1.push_back(teamA);
+            pool2.push_back(teamB);
         }
     }
 
