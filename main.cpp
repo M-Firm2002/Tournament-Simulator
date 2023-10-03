@@ -1,6 +1,7 @@
 #include "main.h"
 #include <vector>
 #include <algorithm>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -26,7 +27,7 @@ void addTeam(team *A) {
 void Fixture(team& teamA, team& teamB) {
     int teamAgoals = 0, teamBgoals = 0;
     cout << "\nNext Fixture: \n" << teamA.name << " vs " << teamB.name << endl;
-    cin.ignore();
+    //cin.ignore();
 
     if (teamA.attack - teamB.defence > 0) {
         teamAgoals = teamA.attack - teamB.defence;
@@ -50,9 +51,57 @@ void Fixture(team& teamA, team& teamB) {
     }
 }
 
+team knockOuts(team& teamA, team& teamB) {
+    int teamAgoals = 0, teamBgoals = 0;
+    team winner;
+    cout << "\nNext Fixture: \n" << teamA.name << " vs " << teamB.name << endl;
+
+    if (teamA.attack - teamB.defence > 0) {
+        teamAgoals = teamA.attack - teamB.defence;
+    }
+    if (teamB.attack - teamA.defence > 0) {
+        teamBgoals = teamB.attack - teamA.defence;
+    }
+
+    if (teamAgoals > teamBgoals) {
+        cout << teamA.name << " wins! " << teamAgoals << "-" << teamBgoals << endl;
+        winner = teamA;
+    }
+    else if (teamBgoals > teamAgoals) {
+        cout << teamB.name << " wins! " << teamAgoals << "-" << teamBgoals << endl;
+        winner = teamB;
+    }
+    else if (teamAgoals == teamBgoals) {
+        cout << "Draw! " << teamAgoals << "-" << teamBgoals << endl;
+
+        if (teamA.attack > teamB.attack) {
+            cout << teamA.name << " wins by penalties!" << endl;
+            winner = teamA;
+        }
+        else if (teamB.attack > teamA.attack) {
+            cout << teamB.name << " wins by penalties!" << endl;
+            winner = teamB;
+        }
+        else if (teamA.attack == teamB.attack) {
+            int x = rand() % 10 + 1;
+
+            if (x > 5) {
+                cout << teamB.name << " wins by penalties!" << endl;
+                winner = teamB;
+            }
+            else {
+                cout << teamA.name << " wins by penalties!" << endl;
+                winner = teamA;
+            }
+        }
+    }
+
+    return winner;
+}
+
 int main(int argc, char * const argv[]) {
     int numOfTeams;
-    vector<team> pool1, pool2;
+    vector<team> knockouts, winners;
 
     cout << "Welcome to Tournament Simulator" << endl;
     cout << "\nSelect the number of teams";
@@ -80,8 +129,8 @@ int main(int argc, char * const argv[]) {
         for (auto group = groups.begin(); group != groups.end(); group++) {
             for (auto teamA = group->begin(); teamA != group->end(); teamA++) {
                 for (auto teamB = teamA + 1; teamB != group->end(); teamB++) {
-                    Fixture(*teamA, *teamB);
                     cin.ignore();
+                    Fixture(*teamA, *teamB);
                 }
             }
 
@@ -92,9 +141,34 @@ int main(int argc, char * const argv[]) {
             teamA = group->at(0);
             teamB = group->at(1);
 
-            pool1.push_back(teamA);
-            pool2.push_back(teamB);
+            knockouts.push_back(teamA);
+            knockouts.push_back(teamB);
         }
+
+        int i = 1;
+        while (knockouts.size() != 1) {
+            cout << "\nKnockout round " << i;
+
+            while (!knockouts.empty()) {
+                cin.ignore();
+                team teamA = knockouts.front();
+                team teamB = knockouts.back();
+
+                team winner = knockOuts(teamA, teamB);
+
+                knockouts.erase(knockouts.begin());
+                knockouts.pop_back();
+
+                winners.push_back(winner);
+            }
+
+            knockouts = winners;
+            winners.erase(winners.begin(), winners.end());
+
+            i++;
+        }
+
+        cout << "\nChampions!!! \n" << knockouts.front().name;
     }
 
     else {
